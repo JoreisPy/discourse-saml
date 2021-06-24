@@ -33,13 +33,13 @@ class SamlAuthenticator < ::Auth::OAuth2Authenticator
 
   def attribute_statements
     result = {}
-    statements = "name:name|email:urn:oid:0.9.2342.19200300.100.1.3|first_name:first_name,firstname,firstName|last_name:last_name,lastname,lastName|nickname:screenName"
+    statements = "name%name,urn:oid:2.16.840.1.113730.3.1.241|email%urn:oid:0.9.2342.19200300.100.1.3|first_name%first_name,firstname,firstName,urn:oid:2.5.4.42|last_name%last_name,lastname,lastName,urn:oid:2.5.4.4|nickname%screenName,urn:oid:2.16.840.1.113730.3.1.241"
     custom_statements = GlobalSetting.try(:saml_attribute_statements)
 
     statements = "#{statements}|#{custom_statements}" if custom_statements.present?
 
     statements.split("|").map do |statement|
-      attrs = statement.split(":")
+      attrs = statement.split("%")
       next if attrs.count != 2
       (result[attrs[0]] ||= []) << attrs[1].split(",")
       result[attrs[0]].flatten!
